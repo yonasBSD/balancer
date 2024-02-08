@@ -8,13 +8,28 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"flag"
 
 	"github.com/gorilla/mux"
 	"github.com/zehuamama/balancer/proxy"
+	"github.com/spf13/viper"
+	"github.com/spf13/pflag"
 )
 
+func init() {
+	viper.SetEnvPrefix("BALANCER")
+	viper.AutomaticEnv()
+
+	flag.String("config", "config.yaml", "Config file")
+
+	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+	pflag.Parse()
+
+	viper.BindPFlags(pflag.CommandLine)
+}
+
 func main() {
-	config, err := ReadConfig("config.yaml")
+	config, err := ReadConfig(viper.GetString("config"))
 	if err != nil {
 		log.Fatalf("read config error: %s", err)
 	}
